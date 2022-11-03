@@ -1,3 +1,4 @@
+# To change google cloud default auth login, use  gcloud auth application-default login
 apiVersion: skaffold/v2alpha3
 kind: Config
 deploy:

@@ -1,23 +1,42 @@
-import express, {Request, Response} from 'express';
-import { body } from 'express-validator'
+import express, { Request, Response } from 'express';
+import { body } from 'express-validator';
 
-import { Ticket } from '../models/ticket'
+import { Ticket } from '../models/ticket';
 
-import { requireAuth, validateRequest, BadRequestError } from '@microservices-learning-tickets/common'
+import { natsClient } from '../nats.client';
+
+import {
+  requireAuth,
+  validateRequest,
+} from '@microservices-learning-tickets/common';
+
+import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
 
 export const createTicketRouter = express.Router();
 
-createTicketRouter.post('/', requireAuth, [
-		body('title').trim().notEmpty().withMessage('A title is required.'),
-		body('price').isFloat({gt: 0}).withMessage('A valid price is required.'),
-	], validateRequest, async (req: Request, res: Response) => {
-	const { title, price } = req.body
+createTicketRouter.post(
+  '/',
+  requireAuth,
+  [
+    body('title').trim().notEmpty().withMessage('A title is required.'),
+    body('price').isFloat({ gt: 0 }).withMessage('A valid price is required.'),
+  ],
+  validateRequest,
+  async (req: Request, res: Response) => {
+    const { title, price } = req.body;
 
-	// using force because we know the middleware validated the current user
-	const ticket = Ticket.build({title, price, userId: req.currentUser!.id})
-	
-	await ticket.save()
-	
-	res.status(201).send(ticket)
-})
+    // using force because we know the middleware validated the current user
+    const ticket = Ticket.build({ title, price, userId: req.currentUser!.id });
 
+    await ticket.save();
+
+    new TicketCreatedPublisher(natsClient.getClient()).publish({
+      id: ticket.id,
+      price: ticket.price,
+      title: ticket.title,
+      userId: ticket.userId,
+    });
+
+    res.status(201).send(ticket);
+  }
+);
