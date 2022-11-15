@@ -3,7 +3,7 @@ import { body } from 'express-validator';
 
 import { Ticket } from '../models/ticket';
 
-import { natsClient } from '../nats.client';
+import { natsClient } from '../nats-client';
 
 import {
   requireAuth,
@@ -30,7 +30,7 @@ createTicketRouter.post(
 
     await ticket.save();
 
-    new TicketCreatedPublisher(natsClient.getClient()).publish({
+    new TicketCreatedPublisher(natsClient.client).publish({
       id: ticket.id,
       price: ticket.price,
       title: ticket.title,

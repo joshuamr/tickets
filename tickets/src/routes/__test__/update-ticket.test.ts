@@ -5,7 +5,10 @@ import { app } from '../../app'
 import mongoose from 'mongoose'
 import {Ticket} from '../../models/ticket'
 
+import { natsClient} from '../../nats-client'
+
 const id = new mongoose.Types.ObjectId().toHexString()
+
 
 describe('update ticket', () => {
 
@@ -128,6 +131,29 @@ describe('update ticket', () => {
 		expect(responseUpdate.status).toEqual(200)
 		expect(responseUpdate.body).toMatchObject({title:title2, price: 20})
 
+	})
+
+	it('publishes an event', async () => {
+		const cookie = await signin()
+
+		const title1 =  'Test1'
+		const title2 =  'Test2'
+
+		const price = 10
+
+		const ticketResponse = await request(app).post(`/api/tickets/`)
+			.set('Cookie', cookie)
+			.send({
+				title: title1,
+				price
+			})
+
+		const responseUpdate = await request(app).patch(`/api/tickets/${ticketResponse.body.id}`)
+			.set('Cookie', cookie)
+			.send({
+				title: title2, price: 20
+			})
+		expect(natsClient.client.publish).toBeCalled()
 	})
 
 })

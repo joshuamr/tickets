@@ -3,6 +3,7 @@ import request from 'supertest'
 import { app } from '../../app'
 
 import { Ticket } from '../../models/ticket'
+import { natsClient} from '../../nats-client'
 
 it ('takes a post request', async ()=> {
 	const response = await request(app).post('/api/tickets').send({})
@@ -85,4 +86,19 @@ it ('creates a ticket', async ()=> {
 	expect(tickets.length).toEqual(1)
 	expect(tickets[0]).toMatchObject({title, price})
 
+})
+
+it('publishes an event', async () => {
+	const cookie = await signin()
+	const title =  'Test'
+
+	const price = 10
+
+	const response = await request(app).post('/api/tickets')
+		.set('Cookie', cookie)
+		.send({
+			title,
+			price
+		})
+	expect(natsClient.client.publish).toBeCalled()
 })

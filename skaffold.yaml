@@ -1,4 +1,6 @@
 # To change google cloud default auth login, use  gcloud auth application-default login
+# DOCKER_HOST="unix:///Users/<your_user_name>/.docker/run/docker.sock" skaffold dev
+
 apiVersion: skaffold/v2alpha3
 kind: Config
 deploy:
@@ -6,13 +8,13 @@ deploy:
     manifests: 
       - ./infra/k8s/*
 build:
-  # local:
-  #   push: false
-  googleCloudBuild:
-    projectId: golden-totality-364202
+  local:
+    push: false
+  # googleCloudBuild:
+  #   projectId: golden-totality-364202
   artifacts:
-    - image: us.gcr.io/golden-totality-364202/auth
-    # - image: joshuamr/auth
+    # - image: us.gcr.io/golden-totality-364202/auth
+    - image: joshuamr/auth
       context: auth
       docker: 
         dockerfile: Dockerfile
@@ -20,8 +22,8 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: us.gcr.io/golden-totality-364202/microservices-tickets
-    # - image: joshuamr/auth
+    # - image: us.gcr.io/golden-totality-364202/microservices-tickets
+    - image: joshuamr/tickets
       context: tickets
       docker: 
         dockerfile: Dockerfile
@@ -29,8 +31,16 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
-    - image: us.gcr.io/golden-totality-364202/ticketing-client
-    # - image: joshuamr/auth
+    - image: joshuamr/orders
+      context: orders
+      docker: 
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    # - image: us.gcr.io/golden-totality-364202/ticketing-client
+    - image: joshuamr/client
       context: client
       docker: 
         dockerfile: Dockerfile

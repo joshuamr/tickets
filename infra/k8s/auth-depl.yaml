@@ -14,8 +14,8 @@ spec:
     spec:
       containers:
         - name: auth
-          image: us.gcr.io/golden-totality-364202/auth
-          # image: joshuamr/auth
+          # image: us.gcr.io/golden-totality-364202/auth
+          image: joshuamr/auth
           env:
             - name: JWT_KEY
               valueFrom:

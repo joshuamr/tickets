@@ -14,7 +14,8 @@ spec:
     spec:
       containers:
         - name: tickets
-          image: us.gcr.io/golden-totality-364202/microservices-tickets
+          # image: us.gcr.io/golden-totality-364202/microservices-tickets
+          image: joshuamr/tickets
           env:
             - name: JWT_KEY
               valueFrom:
@@ -23,7 +24,16 @@ spec:
                   key: JWT_KEY
             - name: MONGO_URI
               value: 'mongodb://tickets-mongo-srv:27017/tickets'
-
+            - name: NATS_URL
+              value: 'http://nats-srv:4222'
+            - name: NATS_CLUSTER_ID
+              value: ticketing
+            - name: NATS_CLIENT_ID
+            # Makes sure that we use the pod name for the client
+            # id so it is traceable to the pod in logs
+              valueFrom:
+                fieldRef:
+                  fieldPath: metadata.name
 ---
 apiVersion: v1
 kind: Service

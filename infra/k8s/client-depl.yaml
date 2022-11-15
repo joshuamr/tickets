@@ -14,8 +14,8 @@ spec:
     spec:
       containers: 
         - name: client
-          image: us.gcr.io/golden-totality-364202/ticketing-client
-          # image: joshuamr/ticketing-client
+          # image: us.gcr.io/golden-totality-364202/ticketing-client
+          image: joshuamr/client
 
 ---
 apiVersion: v1
