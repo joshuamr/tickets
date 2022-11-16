@@ -122,19 +122,23 @@ it('creates an order', async () => {
   expect(orders[0].id).toEqual(response.body.id);
 });
 
-it.todo('Emits and event');
+it('publishes an event', async () => {
+	const cookie = await signin();
 
-// it('publishes an event', async () => {
-// 	const cookie = await signin()
-// 	const title =  'Test'
+  const ticket = Ticket.build({
+    title: 'new ticket',
+    price: 10,
+  });
 
-// 	const price = 10
+  await ticket.save();
 
-// 	const response = await request(app).post('/api/tickets')
-// 		.set('Cookie', cookie)
-// 		.send({
-// 			title,
-// 			price
-// 		})
-// 	expect(natsClient.client.publish).toBeCalled()
-// })
+  const response = await request(app)
+    .post('/api/orders')
+    .set('Cookie', cookie)
+    .send({
+      ticketId: ticket.id,
+    });
+
+  expect(response.status).toEqual(201);
+	expect(natsClient.client.publish).toBeCalled()
+})
