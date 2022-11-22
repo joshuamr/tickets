@@ -22,9 +22,27 @@ build:
         manual:
           - src: 'src/**/*.ts'
             dest: .
+  # - image: us.gcr.io/golden-totality-364202/microservices-expiration
+    - image: joshuamr/expiration
+      context: expiration
+      docker: 
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
     # - image: us.gcr.io/golden-totality-364202/microservices-tickets
     - image: joshuamr/tickets
       context: tickets
+      docker: 
+        dockerfile: Dockerfile
+      sync:
+        manual:
+          - src: 'src/**/*.ts'
+            dest: .
+    # - image: us.gcr.io/golden-totality-364202/microservices-payments
+    - image: joshuamr/payments
+      context: payments
       docker: 
         dockerfile: Dockerfile
       sync:

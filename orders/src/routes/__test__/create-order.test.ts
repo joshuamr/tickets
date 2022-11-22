@@ -2,8 +2,8 @@ import request from 'supertest';
 
 import { app } from '../../app';
 
-import { Order, Ticket } from '../../models';
-import { natsClient } from '../../nats-client';
+import { Order, Ticket } from '../../db/models';
+import { natsClient } from '../../event-bus/nats-client';
 
 import mongoose from 'mongoose';
 import { OrderStatus } from '@microservices-learning-tickets/common';
@@ -71,8 +71,10 @@ it('throws when the ticket is reserved', async () => {
   expect(orders.length).toEqual(0);
 
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'new ticket',
     price: 10,
+    version: 0,
   });
 
   await ticket.save();
@@ -102,8 +104,10 @@ it('creates an order', async () => {
   const cookie = await signin();
 
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'new ticket',
     price: 10,
+    version: 0
   });
 
   await ticket.save();
@@ -126,8 +130,10 @@ it('publishes an event', async () => {
 	const cookie = await signin();
 
   const ticket = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'new ticket',
     price: 10,
+    version: 0
   });
 
   await ticket.save();

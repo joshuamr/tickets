@@ -4,8 +4,9 @@ import { app } from '../../app';
 
 import mongoose from 'mongoose';
 
-import { Ticket, Order } from '../../models';
+import { Ticket, Order } from '../../db/models';
 import { OrderStatus } from '@microservices-learning-tickets/common';
+import { natsClient } from '../../event-bus/nats-client'
 
 describe('cancel order', () => {
   it('returns a 404 if the order is not found', async () => {
@@ -44,8 +45,10 @@ describe('cancel order', () => {
     const cookie = await signin();
 
     const ticket1 = Ticket.build({
+      id: new mongoose.Types.ObjectId().toHexString(),
       title: 'new ticket',
       price: 10,
+      version: 0
     });
 
     await ticket1.save();
@@ -72,8 +75,10 @@ describe('cancel order', () => {
     const cookie = await signin();
 
     const ticket1 = Ticket.build({
+      id: new mongoose.Types.ObjectId().toHexString(),
       title: 'new ticket',
       price: 10,
+      version: 0,
     });
 
     await ticket1.save();
@@ -100,5 +105,31 @@ describe('cancel order', () => {
     expect(response.body.status).toEqual(OrderStatus.Canceled);
   });
 
-  it.todo('Emits an order canceled status event');
+  it('publishes an event', async () => {
+    const cookie = await signin();
+  
+    const ticket = Ticket.build({
+      id: new mongoose.Types.ObjectId().toHexString(),
+      title: 'new ticket',
+      price: 10,
+      version: 0,
+    });
+  
+    await ticket.save();
+  
+    const response = await request(app)
+      .post('/api/orders')
+      .set('Cookie', cookie)
+      .send({
+        ticketId: ticket.id,
+      })
+      .expect(201)
+
+     await request(app)
+      .delete('/api/orders')
+      .set('Cookie', cookie)
+      .send();
+    expect(natsClient.client.publish).toBeCalled()
+  })
+  
 });

@@ -1,18 +1,14 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 
-import { Ticket } from '../models/ticket';
-
 import {
   requireAuth,
   validateRequest,
-  NotFoundError,
   UnauthorizedError,
+  BadRequestError,
 } from '@microservices-learning-tickets/common';
-
-import { TicketUpdatedPublisher } from '../events/publishers/ticket-updated-publisher';
-
-import { natsClient } from '../nats-client';
+import { updateTicket } from '../actions/update-ticket';
+import { getTicket } from '../db/db-actions/get-ticket-from-db';
 
 export const updateTicketRouter = express.Router();
 
@@ -28,27 +24,21 @@ updateTicketRouter.patch(
     const { title, price } = req.body;
     const { id } = req.params;
 
-    // using force because we know the middleware validated the current user
-    const ticket = await Ticket.findById(id);
-
-    if (!ticket) {
-      throw new NotFoundError();
-    }
+    // get the ticket to validate it is for the current user
+    const ticket = await getTicket(id)
 
     if (ticket.userId !== req.currentUser?.id) {
-      throw new UnauthorizedError();
+      throw new UnauthorizedError()
     }
 
-    ticket.set({ title, price });
-    await ticket.save();
+    // if the ticket is associated with an order, we do not allow updates
+    if (ticket.orderId) {
+      throw new BadRequestError('Ticket is reserved and cannot be updated.')
+    }
 
-    new TicketUpdatedPublisher(natsClient.client).publish({
-      id: ticket.id,
-      price: ticket.price,
-      title: ticket.title,
-      userId: ticket.userId,
-    });
+    // update the ticket
+    const updatedTicket = await updateTicket({title, price, id})
 
-    res.status(200).send(ticket);
+    res.status(200).send(updatedTicket);
   }
 );

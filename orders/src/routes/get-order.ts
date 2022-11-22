@@ -6,18 +6,14 @@ import {
   UnauthorizedError,
 } from '@microservices-learning-tickets/common';
 
-import { Order } from '../models';
+import { getOrder } from '../actions/orders/get-order';
 
 export const getOrderRouter = express.Router();
 
 getOrderRouter.get('/:id', requireAuth, async (req: Request, res: Response) => {
   const { id } = req.params;
 
-  const order = await Order.findById(id).populate('ticket');
-
-  if (!order) {
-    throw new NotFoundError();
-  }
+  const order = await getOrder(id)
 
   if (order.userId !== req.currentUser!.id) {
     throw new UnauthorizedError();

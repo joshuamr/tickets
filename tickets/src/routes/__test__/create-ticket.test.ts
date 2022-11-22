@@ -2,8 +2,8 @@ import request from 'supertest'
 
 import { app } from '../../app'
 
-import { Ticket } from '../../models/ticket'
-import { natsClient} from '../../nats-client'
+import { Ticket } from '../../db/models/ticket'
+import { natsClient} from '../../event-bus/nats-client'
 
 it ('takes a post request', async ()=> {
 	const response = await request(app).post('/api/tickets').send({})

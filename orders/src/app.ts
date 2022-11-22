@@ -8,7 +8,6 @@ import { json } from 'body-parser';
 import { createOrderRouter } from './routes/create-order';
 import { getOrderRouter } from './routes/get-order';
 import { getOrdersRouter } from './routes/get-orders';
-import { updateOrderRouter } from './routes/update-order';
 import { deleteOrderRouter } from './routes/cancel-order';
 
 import {
@@ -32,7 +31,6 @@ app.use(
 app.use(currentUser);
 
 app.use('/api/orders', getOrderRouter);
-app.use('/api/orders', updateOrderRouter);
 app.use('/api/orders', getOrdersRouter);
 app.use('/api/orders', createOrderRouter);
 app.use('/api/orders', deleteOrderRouter);

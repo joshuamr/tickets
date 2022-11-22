@@ -8,7 +8,7 @@ declare global {
 	var signin: () =>Promise<string>
 }
 
-jest.mock('../nats-client')
+jest.mock('../event-bus/nats-client')
 let mongo: MongoMemoryServer
 
 beforeAll(async () => {

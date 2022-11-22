@@ -1,14 +1,13 @@
 import express, {Request, Response} from 'express';
 
-import { Ticket } from '../models/ticket'
-
-import { requireAuth, NotFoundError } from '@microservices-learning-tickets/common'
+import { requireAuth } from '@microservices-learning-tickets/common'
+import { getTickets } from '../db/db-actions/get-tickets-from-db';
 
 export const getTicketsRouter = express.Router();
 
 getTicketsRouter.get('/', requireAuth, async (req: Request, res: Response) => {
-	// using force because we know the middleware validated the current user
-	const tickets = await Ticket.find({})
+	
+	const tickets = await getTickets({userId: req.currentUser?.id})
 	res.status(200).send(tickets)
 })
 

@@ -2,13 +2,16 @@ import request from 'supertest';
 
 import { app } from '../../app';
 
-import { Ticket, Order } from '../../models';
+import { Ticket, Order } from '../../db/models';
 import { OrderStatus } from '@microservices-learning-tickets/common';
+import mongoose from 'mongoose'
 
 it('returns all the orders for a user', async () => {
   const ticket1 = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'new ticket',
     price: 10,
+    version: 0
   });
 
   await ticket1.save();
@@ -27,8 +30,10 @@ it('returns all the orders for a user', async () => {
   const cookie = await signin();
 
   const ticket2 = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'new ticket',
     price: 10,
+    version: 0
   });
 
   await ticket2.save();
@@ -41,8 +46,10 @@ it('returns all the orders for a user', async () => {
     });
 
   const ticket3 = Ticket.build({
+    id: new mongoose.Types.ObjectId().toHexString(),
     title: 'new ticket',
     price: 10,
+    version: 0
   });
 
   await ticket3.save();

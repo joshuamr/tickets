@@ -1,16 +1,12 @@
 import express, { Request, Response } from 'express';
 
 import {
-  requireAuth,
   NotFoundError,
+  requireAuth,
   UnauthorizedError,
-  OrderStatus,
 } from '@microservices-learning-tickets/common';
-
-import { Order } from '../models';
-import { OrderCancelledPublisher } from '../publishers/order-cancelled-publisher'
-
-import { natsClient } from '../nats-client';
+import { cancelOrder } from '../actions/orders/cancel-order';
+import { getOrder } from '../actions/orders/get-order';
 
 export const deleteOrderRouter = express.Router();
 
@@ -19,27 +15,17 @@ deleteOrderRouter.delete(
   requireAuth,
   async (req: Request, res: Response) => {
     const { id } = req.params;
-
-    const order = await Order.findById(id).populate('ticket');
-
+    const order = await getOrder(id) 
+    
     if (!order) {
       throw new NotFoundError();
     }
 
-    if (order.userId !== req.currentUser!.id) {
+    if (order.userId !== req.currentUser?.id) {
       throw new UnauthorizedError();
     }
 
-    order.set({ status: OrderStatus.Canceled });
-    // using force because we know the middleware validated the current user
-
-     // publish an event saying that an order was created
-     new OrderCancelledPublisher(natsClient.client).publish({
-      id: order.id,
-      ticket: {
-       id: order.ticket.id,
-      } 
-     })
-    res.status(200).send(order);
+    const cancelledOrder = await cancelOrder(id)
+    res.status(200).send(cancelledOrder);
   }
 );

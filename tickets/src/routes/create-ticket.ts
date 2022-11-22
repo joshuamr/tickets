@@ -1,16 +1,17 @@
 import express, { Request, Response } from 'express';
 import { body } from 'express-validator';
 
-import { Ticket } from '../models/ticket';
+import { Ticket } from '../db/models/ticket';
 
-import { natsClient } from '../nats-client';
+import { natsClient } from '../event-bus/nats-client';
 
 import {
   requireAuth,
   validateRequest,
 } from '@microservices-learning-tickets/common';
 
-import { TicketCreatedPublisher } from '../events/publishers/ticket-created-publisher';
+import { TicketCreatedPublisher } from '../event-bus/events/ticket-created-publisher';
+import { createTicket } from '../actions/create-ticket';
 
 export const createTicketRouter = express.Router();
 
@@ -25,18 +26,9 @@ createTicketRouter.post(
   async (req: Request, res: Response) => {
     const { title, price } = req.body;
 
-    // using force because we know the middleware validated the current user
-    const ticket = Ticket.build({ title, price, userId: req.currentUser!.id });
+    // because we have validated, we can force the currentUser to be a truthy
+    const ticketCreated = await createTicket({title, price, userId: req.currentUser!.id})
 
-    await ticket.save();
-
-    new TicketCreatedPublisher(natsClient.client).publish({
-      id: ticket.id,
-      price: ticket.price,
-      title: ticket.title,
-      userId: ticket.userId,
-    });
-
-    res.status(201).send(ticket);
+    res.status(201).send(ticketCreated);
   }
 );

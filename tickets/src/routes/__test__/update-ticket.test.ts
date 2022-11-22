@@ -3,9 +3,9 @@ import request from 'supertest'
 import { app } from '../../app'
 
 import mongoose from 'mongoose'
-import {Ticket} from '../../models/ticket'
+import {Ticket} from '../../db/models/ticket'
 
-import { natsClient} from '../../nats-client'
+import { natsClient} from '../../event-bus/nats-client'
 
 const id = new mongoose.Types.ObjectId().toHexString()
 
@@ -131,6 +131,33 @@ describe('update ticket', () => {
 		expect(responseUpdate.status).toEqual(200)
 		expect(responseUpdate.body).toMatchObject({title:title2, price: 20})
 
+	})
+
+	it ('throws an error when the ticket is reserved', async ()=> {
+		const cookie = await signin()
+
+		const title1 =  'Test1'
+		const title2 =  'Test2'
+
+		const price = 10
+
+		const ticketResponse = await request(app).post(`/api/tickets/`)
+			.set('Cookie', cookie)
+			.send({
+				title: title1,
+				price
+			})
+		
+		const ticket = await Ticket.findById(ticketResponse.body.id)
+		ticket!.set({orderId: new mongoose.Types.ObjectId().toHexString()})
+		await ticket!.save()
+
+		await request(app).patch(`/api/tickets/${ticketResponse.body.id}`)
+			.set('Cookie', cookie)
+			.send({
+				title: title2, price: 20
+			})
+			.expect(401)
 	})
 
 	it('publishes an event', async () => {

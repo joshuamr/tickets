@@ -4,7 +4,7 @@ import { app } from '../../app';
 
 import mongoose from 'mongoose';
 
-import { Ticket, Order } from '../../models';
+import { Ticket, Order } from '../../db/models';
 import { OrderStatus } from '@microservices-learning-tickets/common';
 
 describe('get order', () => {
@@ -44,8 +44,10 @@ describe('get order', () => {
     const cookie = await signin();
 
     const ticket1 = Ticket.build({
+      id: new mongoose.Types.ObjectId().toHexString(),
       title: 'new ticket',
       price: 10,
+      version: 0
     });
 
     await ticket1.save();
@@ -72,8 +74,10 @@ describe('get order', () => {
     const cookie = await signin();
 
     const ticket1 = Ticket.build({
+      id: new mongoose.Types.ObjectId().toHexString(),
       title: 'new ticket',
       price: 10,
+      version: 0
     });
 
     await ticket1.save();
