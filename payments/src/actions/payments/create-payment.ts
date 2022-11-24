@@ -25,7 +25,11 @@ export async function createPayment(orderId: string, token: string) {
     stripeId: charge.id,
   });
 
-  await publishPaymentCreatedEvent({ ...payment, id: payment.id || '' });
+  await publishPaymentCreatedEvent({
+    orderId: order.id,
+    stripeId: charge.id,
+    id: payment.id || '',
+  });
 
   return payment;
 }
