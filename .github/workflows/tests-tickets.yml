@@ -9,15 +9,15 @@ jobs:
     steps: 
       - name: Get code
         uses: actions/checkout@v2
-      # - name: Cache dependencies
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 16
-      #     cache: 'npm'
-      #     cache-dependency-path: tickets/package-lock.json
-      - name: Change into tickets dir
-        run: cd tickets 
+      - name: Cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: tickets/package-lock.json
       - name: Install dependencies
+        working-directory: ./tickets
         run: npm install 
       - name: Run tests
+        working-directory: ./tickets
         run: npm run test:ci

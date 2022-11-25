@@ -8,17 +8,15 @@ jobs:
     steps: 
       - name: Get code
         uses: actions/checkout@v2
-      # - name: Cache dependencies
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 16
-      #     cache: 'npm'
-      #     cache-dependency-path: auth/package-lock.json
-      - name: Change into auth dir
-        run: cd auth 
-      - name: pwd
-        run: pwd
+      - name: Cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: auth/package-lock.json
       - name: Install dependencies
+        working-directory: ./auth
         run: npm install 
       - name: Run tests
+        working-directory: ./auth
         run: npm run test:ci

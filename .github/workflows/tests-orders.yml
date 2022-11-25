@@ -9,15 +9,15 @@ jobs:
     steps: 
       - name: Get code
         uses: actions/checkout@v2
-      # - name: Cache dependencies
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 16
-      #     cache: 'npm'
-      #     cache-dependency-path: orders/package-lock.json
-      - name: Change into orders dir
-        run: cd orders 
+      - name: Cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: orders/package-lock.json
       - name: Install dependencies
+        working-directory: ./orders
         run: npm install 
       - name: Run tests
+        working-directory: ./orders
         run: npm run test:ci

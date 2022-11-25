@@ -9,15 +9,15 @@ jobs:
     steps: 
       - name: Get code
         uses: actions/checkout@v2
-      # - name: Cache dependencies
-      #   uses: actions/setup-node@v3
-      #   with:
-      #     node-version: 16
-      #     cache: 'npm'
-      #     cache-dependency-path: payments/package-lock.json
-      - name: Change into payments dir
-        run: cd payments 
+      - name: Cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: payments/package-lock.json
       - name: Install dependencies
+        working-directory: ./payments
         run: npm install 
       - name: Run tests
+        working-directory: ./payments
         run: npm run test:ci
