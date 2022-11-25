@@ -1,11 +1,12 @@
-name: tests-auth
+name: tests-payments
 on: 
   pull_request:
     paths: 
-      - 'auth/**'
+      - 'payments/**'
   
 jobs: 
-  auth-test:
+  payments-test:
+    name: payments-test
     runs-on: ubuntu-latest
     steps: 
       - name: Get code
@@ -15,10 +16,10 @@ jobs:
         with:
           node-version: 16
           cache: 'npm'
-          cache-dependency-path: auth/package-lock.json
+          cache-dependency-path: payments/package-lock.json
       - name: Install dependencies
-        working-directory: ./auth
+        working-directory: ./payments
         run: npm install 
       - name: Run tests
-        working-directory: ./auth
+        working-directory: ./payments
         run: npm run test:ci

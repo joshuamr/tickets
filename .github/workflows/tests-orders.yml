@@ -1,11 +1,12 @@
-name: tests-auth
+name: tests-orders
 on: 
   pull_request:
     paths: 
-      - 'auth/**'
+      - 'orders/**'
   
 jobs: 
-  auth-test:
+  orders-test:
+    name: orders-test
     runs-on: ubuntu-latest
     steps: 
       - name: Get code
@@ -15,10 +16,10 @@ jobs:
         with:
           node-version: 16
           cache: 'npm'
-          cache-dependency-path: auth/package-lock.json
+          cache-dependency-path: orders/package-lock.json
       - name: Install dependencies
-        working-directory: ./auth
+        working-directory: ./orders
         run: npm install 
       - name: Run tests
-        working-directory: ./auth
+        working-directory: ./orders
         run: npm run test:ci
