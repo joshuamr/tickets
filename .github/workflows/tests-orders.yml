@@ -7,5 +7,17 @@ jobs:
     name: orders-test
     runs-on: ubuntu-latest
     steps: 
-      - uses: actions/checkout@v2
-      - run: cd orders && npm install && npm run test:ci
+      - name: Get code
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: orders/package-lock.json
+      - name: Change into orders dir
+        run: cd orders 
+      - name: Install dependencies
+        run: npm install 
+      - name: Run tests
+        run: npm run test:ci

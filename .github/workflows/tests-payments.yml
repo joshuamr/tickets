@@ -7,5 +7,17 @@ jobs:
     name: payments-test
     runs-on: ubuntu-latest
     steps: 
-      - uses: actions/checkout@v2
-      - run: cd payments && npm install && npm run test:ci
+      - name: Get code
+        uses: actions/checkout@v2
+      - name: Cache dependencies
+        uses: actions/setup-node@v3
+        with:
+          node-version: 16
+          cache: 'npm'
+          cache-dependency-path: payments/package-lock.json
+      - name: Change into payments dir
+        run: cd payments 
+      - name: Install dependencies
+        run: npm install 
+      - name: Run tests
+        run: npm run test:ci
